@@ -96,13 +96,29 @@ object PersistentModel extends Model:
    */
 
   def create(task: Task): Id =
-    ???
+    val tasks = loadTasks()
+    val id = loadId()
+    saveTasks(Tasks(tasks.toMap + (id -> task)))
+    saveId(id.next)
+
+    id
 
   def read(id: Id): Option[Task] =
-    ???
+    val tasks = loadTasks()
+
+    tasks.toMap.get(id)
 
   def update(id: Id)(f: Task => Task): Option[Task] =
-    ???
+    val tasks = loadTasks().toMap
+    val updatedTasks = tasks.map((itemId, itemTask) => {
+      if itemId == id then
+        itemId -> f(itemTask)
+      else
+        itemId -> itemTask
+    })
+    saveTasks(Tasks(updatedTasks))
+
+    updatedTasks.get(id)
 
   def delete(id: Id): Boolean =
     ???
@@ -120,4 +136,5 @@ object PersistentModel extends Model:
     ???
 
   def clear(): Unit =
-    ???
+    Files.deleteIfExists(tasksPath)
+    Files.deleteIfExists(idPath)

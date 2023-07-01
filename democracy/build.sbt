@@ -8,5 +8,4 @@ libraryDependencies ++= Seq(
 )
 
 Compile / scalacOptions ++= Seq("-deprecation")
-
 Test / testFrameworks += new TestFramework("munit.Framework")

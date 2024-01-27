@@ -1,0 +1,20 @@
+{
+    "[markdown]": {
+        "editor.codeActionsOnSave": {
+            "source.fixAll": "always",
+            "source.organizeImports": "always"
+        },
+        "editor.formatOnSave": true
+    },
+    "[scala]": {
+        "editor.codeActionsOnSave": {
+            "source.fixAll": "always",
+            "source.organizeImports": "always"
+        },
+        "editor.formatOnSave": true
+    },
+    "files.watcherExclude": {
+        "**/target": true
+    },
+    "metals.showImplicitArguments": true
+}

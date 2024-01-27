@@ -15,7 +15,8 @@
 		"vscode": {
 			"extensions": [
 				"scala-lang.scala",
-				"scalameta.metals"
+				"scalameta.metals",
+				"DavidAnson.vscode-markdownlint"
 			]
 		}
 	},

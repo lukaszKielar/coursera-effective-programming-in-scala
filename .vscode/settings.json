@@ -11,7 +11,7 @@
             "source.fixAll": "always",
             "source.organizeImports": "always"
         },
-        "editor.formatOnSave": true
+        "editor.formatOnSave": false
     },
     "files.watcherExclude": {
         "**/target": true

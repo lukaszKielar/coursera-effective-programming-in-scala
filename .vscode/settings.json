@@ -11,7 +11,9 @@
             "source.fixAll": "always",
             "source.organizeImports": "always"
         },
-        "editor.formatOnSave": false
+        "editor.defaultFormatter": "scalameta.metals",
+        "editor.formatOnSave": true,
+        "files.trimTrailingWhitespace": true
     },
     "files.watcherExclude": {
         "**/target": true

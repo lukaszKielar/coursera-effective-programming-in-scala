@@ -4,18 +4,32 @@ import cats.implicits.*
 import scala.collection.mutable
 import todo.data.*
 
-/**
- * The InMemoryModel is a Model that stores all the tasks in RAM, and hence they
- * are lost when the server restarts.
- *
- * You should modify this file.
- */
+/** The InMemoryModel is a Model that stores all the tasks in RAM, and hence
+  * they are lost when the server restarts.
+  *
+  * You should modify this file.
+  */
 object InMemoryModel extends Model:
   /* These are the tasks the application starts with. You can change these if you want. */
   val defaultTasks = List(
-    Id(0) -> Task(State.completedNow, "Complete Effective Scala Week 2", None, List(Tag("programming"), Tag("scala"))),
-    Id(1) -> Task(State.Active, "Complete Effective Scala Week 3", Some("Finish the todo list exercise"), List(Tag("programming"), Tag("scala"), Tag("encapsulation"), Tag("sbt"))),
-    Id(2) -> Task(State.Active, "Make a sandwich", Some("Cheese and salad or ham and tomato?"), List(Tag("food"), Tag("lunch")))
+    Id(0) -> Task(
+      State.completedNow,
+      "Complete Effective Scala Week 2",
+      None,
+      List(Tag("programming"), Tag("scala"))
+    ),
+    Id(1) -> Task(
+      State.Active,
+      "Complete Effective Scala Week 3",
+      Some("Finish the todo list exercise"),
+      List(Tag("programming"), Tag("scala"), Tag("encapsulation"), Tag("sbt"))
+    ),
+    Id(2) -> Task(
+      State.Active,
+      "Make a sandwich",
+      Some("Cheese and salad or ham and tomato?"),
+      List(Tag("food"), Tag("lunch"))
+    )
   )
 
   /* Every Task is associated with an Id. Ids must be unique. */
@@ -34,29 +48,31 @@ object InMemoryModel extends Model:
 
   def create(task: Task): Id =
     val id = idGenerator.nextId()
+    idStore.update(id, task)
     id
 
   def read(id: Id): Option[Task] =
     idStore.get(id)
 
   def complete(id: Id): Option[Task] =
-    None
+    update(id)(_.complete)
 
   def update(id: Id)(f: Task => Task): Option[Task] =
     idStore.updateWith(id)(opt => opt.map(f))
 
   def delete(id: Id): Boolean =
-    var found = false
-    found
+    idStore.remove(id).isDefined
 
   def tasks: Tasks =
     Tasks(idStore)
 
   def tags: Tags =
-    Tags(List.empty)
+    val tags = idStore.flatMap((_, task) => task.tags).toSet.toList
+    Tags(tags)
 
   def tasks(tag: Tag): Tasks =
-    Tasks(idStore)
+    val tasks = idStore.filter((_, task) => task.tags.contains(tag))
+    Tasks(tasks)
 
   def clear(): Unit =
     idStore.clear()

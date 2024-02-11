@@ -128,10 +128,15 @@ class TodoSuite extends FunSuite:
       assertTaskActive(name, model.read(id1))
       assertTaskCompleted(name, model.read(id2))
 
-      model.complete(id1)
+      val returned1 = model.complete(id1)
+      val returned2 = model.complete(id2)
+      val read1 = model.read(id1)
+      val read2 = model.read(id2)
 
-      assertTaskCompleted(name, model.complete(id1))
-      assertTaskCompleted(name, model.complete(id2))
+      assertTaskCompleted(name, returned1)
+      assertTaskCompleted(name, returned2)
+      assertEquals(read1, returned1, s"Using $name: Reading the task $id1 returned a different value from completing it")
+      assertEquals(read2, returned2, s"Using $name: Reading the task $id2 returned a different value from completing it")
     }
 
     fixture.test("tags returns all tags"){ case (name, model) =>

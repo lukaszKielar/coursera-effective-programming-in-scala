@@ -34,7 +34,8 @@ object PersistentModel extends Model:
       Tasks.empty
 
   /**
-   * Load an Id from a file. Returns Id(0) if the file does not exist, and throws
+   * Load an Id from a file. This Id is guaranteed to have never been used before.
+   * Returns Id(0) if the file does not exist, and throws
    * an exception if decoding the file fails.
    */
   def loadId(): Id =
@@ -70,7 +71,8 @@ object PersistentModel extends Model:
     save(tasksPath, tasks)
 
   /**
-   * Save Id to a file. If the file already exists it is overwritten.
+   * Save Id to a file. The Id saved to a file must be an Id that was never used before.
+   * If the file already exists it is overwritten.
    */
   def saveId(id: Id): Unit =
     save(idPath, id)
@@ -96,52 +98,31 @@ object PersistentModel extends Model:
    */
 
   def create(task: Task): Id =
-    val tasks = loadTasks()
-    val id = loadId()
-    saveTasks(Tasks(tasks.toMap + (id -> task)))
-    saveId(id.next)
-
-    id
+    ???
 
   def read(id: Id): Option[Task] =
-    val tasks = loadTasks()
-
-    tasks.toMap.get(id)
+    ???
 
   def update(id: Id)(f: Task => Task): Option[Task] =
-    val tasks = loadTasks().toMap
-    val updatedTasks = tasks.map((itemId, itemTask) => {
-      if itemId == id then
-        itemId -> f(itemTask)
-      else
-        itemId -> itemTask
-    })
-    saveTasks(Tasks(updatedTasks))
-
-    updatedTasks.get(id)
+    ???
 
   def delete(id: Id): Boolean =
-    val tasks = loadTasks().toMap
-    saveTasks(Tasks(tasks - id))
-
-    tasks.isDefinedAt(id)
+    ???
 
   def tasks: Tasks =
-    loadTasks()
+    ???
 
   def tasks(tag: Tag): Tasks =
-    val filteredTasks = loadTasks().toList.filter((_, itemTask) => itemTask.tags.contains(tag))
-
-    Tasks(filteredTasks)
+    ???
 
   def complete(id: Id): Option[Task] =
-    update(id)(task => task.complete)
+    ???
 
   def tags: Tags =
-    val tags = loadTasks().toList.flatMap((_, task) => task.tags).toList.distinct
+    ???
 
-    Tags(tags)
-
+  /**
+  * Delete the tasks and id files if they exist.
+  */
   def clear(): Unit =
-    Files.deleteIfExists(tasksPath)
-    Files.deleteIfExists(idPath)
+    ???

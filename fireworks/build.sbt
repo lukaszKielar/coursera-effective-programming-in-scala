@@ -1,7 +1,7 @@
 course := "effective-scala"
 assignment := "fireworks"
 
-scalaVersion := "3.3.1"
+scalaVersion := "3.3.0"
 
 libraryDependencies ++= Seq(
   ("org.creativescala" %% "doodle"           % "0.9.21").cross(CrossVersion.for3Use2_13),

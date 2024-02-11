@@ -11,3 +11,8 @@ Exercises:
 - Week 5 - [codecs](./codecs/)
 - Week 6 - [wikigraph](./wikigraph/)
 
+## Submit solution
+
+```bash
+sbt "submit <email> <token>"
+```

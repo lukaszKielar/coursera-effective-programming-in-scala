@@ -1,13 +1,17 @@
 package todo
 
 import cats.implicits.*
-import java.nio.file.{Path, Paths, Files}
-import java.nio.charset.StandardCharsets
-import io.circe.{Decoder, Encoder}
+import io.circe.Decoder
+import io.circe.Encoder
 import io.circe.parser.*
 import io.circe.syntax.*
-import scala.collection.mutable
 import todo.data.*
+
+import java.nio.charset.StandardCharsets
+import java.nio.file.Files
+import java.nio.file.Path
+import java.nio.file.Paths
+import scala.collection.mutable
 
 /** The PersistentModel is a model that saves all data to files, meaning that
   * tasks persist between restarts.
@@ -88,30 +92,51 @@ object PersistentModel extends Model:
    */
 
   def create(task: Task): Id =
-    ???
+    val id = loadId()
+    val tasks = this.tasks
+    saveTasks(Tasks(tasks.toMap + (id -> task)))
+    saveId(id.next)
+
+    id
 
   def read(id: Id): Option[Task] =
-    ???
+    this.tasks.toMap.get(id)
 
   def update(id: Id)(f: Task => Task): Option[Task] =
-    ???
+    val tasks = this.tasks.toMap
+    val maybeTask = tasks.get(id).map(f)
+    maybeTask match
+      case None => None
+      case Some(newTask) => {
+        saveTasks(Tasks(tasks + (id -> newTask)))
+        Some(newTask)
+      }
 
   def delete(id: Id): Boolean =
-    ???
+    val tasks = this.tasks.toMap
+    val maybeId = tasks.get(id)
+
+    maybeId match
+      case None => false
+      case Some(value) => {
+        saveTasks(Tasks(tasks.filterKeys(_ != id)))
+        true
+      }
 
   def tasks: Tasks =
-    ???
+    loadTasks()
 
   def tasks(tag: Tag): Tasks =
-    ???
+    Tasks(this.tasks.toMap.filter((_, v) => v.tags.contains(tag)))
 
   def complete(id: Id): Option[Task] =
-    ???
+    update(id)(_.complete)
 
   def tags: Tags =
-    ???
+    Tags(this.tasks.toList.flatMap((_, v) => v.tags).toSet.toList)
 
   /** Delete the tasks and id files if they exist.
     */
   def clear(): Unit =
-    ???
+    Files.deleteIfExists(tasksPath)
+    Files.deleteIfExists(idPath)

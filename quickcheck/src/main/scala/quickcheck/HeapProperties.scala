@@ -127,9 +127,21 @@ trait HeapProperties(val heapInterface: HeapInterface):
   //  4. all the other cases (which should not happen in correct heap
   //     implementations).
   val meldingHeaps: (String, Prop) =
+    def check(
+        heap1: List[Node],
+        heap2: List[Node],
+        meldedHeap: List[Node]
+    ): Boolean = {
+      if meldedHeap.isEmpty && heap1.isEmpty && heap2.isEmpty then true
+      else if !isEmpty(heap1) && findMin(meldedHeap) == findMin(heap1) then {
+        check(deleteMin(heap1), heap2, deleteMin(meldedHeap))
+      } else if !isEmpty(heap2) && findMin(meldedHeap) == findMin(heap2) then {
+        check(heap1, deleteMin(heap2), deleteMin(meldedHeap))
+      } else false
+    }
     "finding the minimum of melding any two heaps should return the minimum of one or the other of the source heaps" ->
       forAll { (heap1: List[Node], heap2: List[Node]) =>
-        ???
+        check(heap1, heap2, meld(heap1, heap2))
       }
 
   // Random heap generator (used by Scalacheck)

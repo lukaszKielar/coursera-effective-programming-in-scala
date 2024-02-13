@@ -1,15 +1,23 @@
 package quickcheck
 
+import org.scalacheck.Arbitrary
 import org.scalacheck.Arbitrary.arbitrary
-import org.scalacheck.Gen.{const, oneOf}
-import org.scalacheck.{Arbitrary, Gen, Prop, Test}
-import org.scalacheck.rng.Seed
+import org.scalacheck.Gen
+import org.scalacheck.Gen.const
+import org.scalacheck.Gen.oneOf
+import org.scalacheck.Prop
 import org.scalacheck.Prop.*
+import org.scalacheck.Test
+import org.scalacheck.rng.Seed
 
 class QuickCheckSuite extends munit.FunSuite:
 
   test("Bogus (1) binomial heap does not satisfy properties. (10pts)") {
-    checkBogus(quickcheck.test.Bogus1BinomialHeap())(_.insertMinAndGetMin, _.deleteAllProducesSortedList, _.meldingHeaps)
+    checkBogus(quickcheck.test.Bogus1BinomialHeap())(
+      _.insertMinAndGetMin,
+      _.deleteAllProducesSortedList,
+      _.meldingHeaps
+    )
   }
 
   test("Bogus (2) binomial heap does not satisfy properties. (10pts)") {
@@ -17,7 +25,10 @@ class QuickCheckSuite extends munit.FunSuite:
   }
 
   test("Bogus (3) binomial heap does not satisfy properties. (10pts)") {
-    checkBogus(quickcheck.test.Bogus3BinomialHeap())(_.meldingSmallHeaps, _.meldingHeaps)
+    checkBogus(quickcheck.test.Bogus3BinomialHeap())(
+      _.meldingSmallHeaps,
+      _.meldingHeaps
+    )
   }
 
   test("Bogus (4) binomial heap does not satisfy properties. (10pts)") {
@@ -25,7 +36,11 @@ class QuickCheckSuite extends munit.FunSuite:
   }
 
   test("Bogus (5) binomial heap does not satisfy properties. (10pts)") {
-    checkBogus(quickcheck.test.Bogus5BinomialHeap())(_.deleteAllProducesSortedList, _.meldingSmallHeaps, _.meldingHeaps)
+    checkBogus(quickcheck.test.Bogus5BinomialHeap())(
+      _.deleteAllProducesSortedList,
+      _.meldingSmallHeaps,
+      _.meldingHeaps
+    )
   }
 
   import scala.concurrent.duration.DurationInt
@@ -48,7 +63,8 @@ class QuickCheckSuite extends munit.FunSuite:
   def checkPropertiesOnCorrectHeap(): Unit =
     // All the props should pass on the correct implementation
     val propertiesOnCorrectHeap =
-      val heap = new HeapProperties(quickcheck.test.BinomialHeap()) with ArbitraryHeaps
+      val heap = new HeapProperties(quickcheck.test.BinomialHeap())
+        with ArbitraryHeaps
       new org.scalacheck.Properties("HeapProperties") {
         def register(labelledProp: (String, Prop)): Unit =
           property(labelledProp(0)) = labelledProp(1)
@@ -67,7 +83,8 @@ class QuickCheckSuite extends munit.FunSuite:
         Console.withOut(ps) {
           Test.checkProperties(
             testParameters.withTestCallback(
-              org.scalacheck.util.ConsoleReporter(verbosity = 1, columnWidth = 120)
+              org.scalacheck.util
+                .ConsoleReporter(verbosity = 1, columnWidth = 120)
                 .chain(testParameters.testCallback)
             ),
             propertiesOnCorrectHeap
@@ -76,44 +93,67 @@ class QuickCheckSuite extends munit.FunSuite:
       ps.flush()
       (testResult, baos.toString)
 
-    if result.exists(!_._2.passed) then throw AssertionError(
-      s"Some properties were not satisfied by the correct binomial heap implementation. Make sure the properties you write are true of heaps. Here is the output of scalacheck when checking your properties on the correct heap implementation.\n$output"
-    )
+    if result.exists(!_._2.passed) then
+      throw AssertionError(
+        s"Some properties were not satisfied by the correct binomial heap implementation. Make sure the properties you write are true of heaps. Here is the output of scalacheck when checking your properties on the correct heap implementation.\n$output"
+      )
   end checkPropertiesOnCorrectHeap
 
   // The properties provided by shouldFail are expected not to pass
-  def checkPropertiesOnBogusHeap(heapInterface: HeapInterface, shouldFail: Seq[HeapProperties => (String, Prop)]): Unit =
-    val submittedProperties = new HeapProperties(heapInterface) with ArbitraryHeaps
-    val correctProperties   = new HeapProperties(heapInterface) with CorrectProperties with ArbitraryHeaps
+  def checkPropertiesOnBogusHeap(
+      heapInterface: HeapInterface,
+      shouldFail: Seq[HeapProperties => (String, Prop)]
+  ): Unit =
+    val submittedProperties = new HeapProperties(heapInterface)
+      with ArbitraryHeaps
+    val correctProperties = new HeapProperties(heapInterface)
+      with CorrectProperties
+      with ArbitraryHeaps
     shouldFail.foreach { select =>
       // Select the property in both the submitted properties and the correct properties
       val (label, submittedProp) = select(submittedProperties)
-      val (_, correctProp)       = select(correctProperties)
+      val (_, correctProp) = select(correctProperties)
       val seed = Seed(1234567L)
       // Check both the submitted property and the correct property
       val submittedPropResult = checkProp(submittedProp, seed, testParameters)
-      val correctPropResult   = checkProp(correctProp, seed, testParameters)
+      val correctPropResult = checkProp(correctProp, seed, testParameters)
       // Check that the submitted property detects a bug in the heap implementation.
       // That is, check that it fails on some input.
       (submittedPropResult.status, correctPropResult.status) match
-        case (False | Prop.Exception(_: NoSuchElementException), _) => () // OK (some bogus heap implementations fail the properties by throwing a NoSuchElementException)
+        case (False | Prop.Exception(_: NoSuchElementException), _) =>
+          () // OK (some bogus heap implementations fail the properties by throwing a NoSuchElementException)
         case (Prop.Exception(e), _) =>
-          throw AssertionError(s"Unexpected exception $e occurred during evaluation of the property: \"$label\"")
+          throw AssertionError(
+            s"Unexpected exception $e occurred during evaluation of the property: \"$label\""
+          )
         case (True | Proof, False | Prop.Exception(_) | Undecided) =>
           // The submitted property unexpectedly passed, so we show some input values for which it is expected to fail
-          val inputs = correctPropResult.args.zipWithIndex.map((arg, i) => s"> ARG_$i: ${arg.arg}").mkString("\n")
-          throw AssertionError(s"The property \"$label\" was expected to fail but it succeeded.\nThe following input is expected to make it fail\n$inputs")
+          val inputs = correctPropResult.args.zipWithIndex
+            .map((arg, i) => s"> ARG_$i: ${arg.arg}")
+            .mkString("\n")
+          throw AssertionError(
+            s"The property \"$label\" was expected to fail but it succeeded.\nThe following input is expected to make it fail\n$inputs"
+          )
         case (Undecided, _) =>
-          throw AssertionError(s"The property \"$label\" was expected to fail but Scalacheck could not generate enough inputs to test it")
+          throw AssertionError(
+            s"The property \"$label\" was expected to fail but Scalacheck could not generate enough inputs to test it"
+          )
         case (True | Proof, True | Proof) =>
-          throw AssertionError(s"The property \"$label\" was expected to fail but it succeeded.\nSubmit your work to the online grading infrastructure to get examples of input data that should fail the property.")
+          throw AssertionError(
+            s"The property \"$label\" was expected to fail but it succeeded.\nSubmit your work to the online grading infrastructure to get examples of input data that should fail the property."
+          )
     }
   end checkPropertiesOnBogusHeap
 
-  def checkProp(p: Prop, startSeed: Seed, testParameters: Test.Parameters): Result =
+  def checkProp(
+      p: Prop,
+      startSeed: Seed,
+      testParameters: Test.Parameters
+  ): Result =
     // Set up tests
     val iterations = testParameters.minSuccessfulTests
-    val sizeStep = (testParameters.maxSize - testParameters.minSize) / iterations.toDouble
+    val sizeStep =
+      (testParameters.maxSize - testParameters.minSize) / iterations.toDouble
     // Generate all results
     val counts = LazyList.range(0, iterations)
     val results = counts
@@ -123,8 +163,10 @@ class QuickCheckSuite extends munit.FunSuite:
         val genPrms = Gen.Parameters.default
           .withLegacyShrinking(testParameters.useLegacyShrinking)
           .withInitialSeed(Some(seed))
-          .withSize((testParameters.minSize.toDouble + (sizeStep * count)).round.toInt)
-        
+          .withSize(
+            (testParameters.minSize.toDouble + (sizeStep * count)).round.toInt
+          )
+
         p(genPrms)
       }
 

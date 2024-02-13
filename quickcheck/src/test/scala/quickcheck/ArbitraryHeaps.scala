@@ -1,8 +1,10 @@
 package quickcheck
 
+import org.scalacheck.Arbitrary
 import org.scalacheck.Arbitrary.arbitrary
-import org.scalacheck.{Arbitrary, Gen}
-import org.scalacheck.Gen.{const, oneOf}
+import org.scalacheck.Gen
+import org.scalacheck.Gen.const
+import org.scalacheck.Gen.oneOf
 
 trait ArbitraryHeaps extends HeapProperties:
 

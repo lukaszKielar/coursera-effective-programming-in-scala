@@ -6,14 +6,14 @@ package quickcheck
 
 /**
  * Interface for the heap data structure
- * 
+ *
  * This interface defines the operations for constructing
  * and manipulating a heap. A heap is modeled by the
  * type `List[Node]`, and the only way to construct
  * a heap is to use the constructor `empty`, and then
  * to use the operation `insert` to add more elements
  * to it.
- * 
+ *
  * @see http://www.brics.dk/RS/96/37/BRICS-RS-96-37.pdf
  */
 trait HeapInterface:

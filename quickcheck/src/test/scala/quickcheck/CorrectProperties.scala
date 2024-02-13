@@ -1,8 +1,10 @@
 package quickcheck
 
-import org.scalacheck.{Arbitrary, Gen, Prop}
+import org.scalacheck.Arbitrary
 import org.scalacheck.Arbitrary.*
+import org.scalacheck.Gen
 import org.scalacheck.Gen.*
+import org.scalacheck.Prop
 import org.scalacheck.Prop.*
 
 trait CorrectProperties extends HeapProperties:

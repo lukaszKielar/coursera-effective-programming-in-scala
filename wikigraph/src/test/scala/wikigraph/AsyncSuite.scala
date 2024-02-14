@@ -10,9 +10,8 @@ class AsyncSuite extends munit.FunSuite:
 
   import Async.*
 
-  /**
-    * Returns a function that performs an asynchronous
-    * computation returning the given result after 400 milliseconds.
+  /** Returns a function that performs an asynchronous computation returning the
+    * given result after 400 milliseconds.
     */
   def delay[A](result: Try[A]): () => Future[A] =
     val t = java.util.Timer()
@@ -22,7 +21,7 @@ class AsyncSuite extends munit.FunSuite:
         def run(): Unit =
           p.complete(result)
           ()
-      t.schedule(task, 400 /* milliseconds */)
+      t.schedule(task, 400 /* milliseconds */ )
       p.future
     }
 
@@ -35,7 +34,9 @@ class AsyncSuite extends munit.FunSuite:
     assertEquals(result, Success(x % 2 == 0))
   }
 
-  test("transformSuccess should propagate the failure of a failed computation") {
+  test(
+    "transformSuccess should propagate the failure of a failed computation"
+  ) {
     val failure = Exception("Failed asynchronous computation")
     val eventuallyResult =
       transformSuccess(Future.failed(failure))
@@ -59,7 +60,9 @@ class AsyncSuite extends munit.FunSuite:
     assertEquals(result, Success(x))
   }
 
-  test("sequenceComputations should start the second computation after the first has completed (2pts)") {
+  test(
+    "sequenceComputations should start the second computation after the first has completed (2pts)"
+  ) {
     try
       val eventuallyResult =
         sequenceComputations(delay(Success(1)), delay(Success(2)))
@@ -70,7 +73,9 @@ class AsyncSuite extends munit.FunSuite:
         ()
   }
 
-  test("sequenceComputations should not start the second computation if the first has failed (2pts)") {
+  test(
+    "sequenceComputations should not start the second computation if the first has failed (2pts)"
+  ) {
     val counter = AtomicInteger(0)
     val eventuallyResult =
       sequenceComputations(
@@ -81,7 +86,9 @@ class AsyncSuite extends munit.FunSuite:
     assertEquals(counter.get(), 0)
   }
 
-  test("concurrentComputations should start both computations independently of each other’s completion (2pts)") {
+  test(
+    "concurrentComputations should start both computations independently of each other’s completion (2pts)"
+  ) {
     try
       val eventuallyResult =
         concurrentComputations(delay(Success(1)), delay(Success(2)))

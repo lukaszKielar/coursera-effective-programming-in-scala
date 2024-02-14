@@ -18,5 +18,6 @@
     "files.watcherExclude": {
         "**/target": true
     },
+    "metals.customProjectRoot": "wikigraph",
     "metals.showImplicitArguments": true
 }

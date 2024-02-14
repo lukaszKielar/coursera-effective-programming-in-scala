@@ -1,14 +1,17 @@
 package codecs
 
-import org.scalacheck
-import org.scalacheck.{ Gen, Prop }
-import org.scalacheck.Prop.propBoolean
 import munit.FunSuite
+import org.scalacheck
+import org.scalacheck.Gen
+import org.scalacheck.Prop
+import org.scalacheck.Prop.propBoolean
 
 class CodecsSuite
-  extends FunSuite
-    with EncoderInstances with TestEncoders
-    with DecoderInstances with TestDecoders
+    extends FunSuite
+    with EncoderInstances
+    with TestEncoders
+    with DecoderInstances
+    with TestDecoders
     with PersonCodecs
     with ContactsCodecs:
 
@@ -19,17 +22,23 @@ class CodecsSuite
       else throw AssertionError(labels.mkString(". "))
     result.status match
       case scalacheck.Test.Passed | _: scalacheck.Test.Proved => ()
-      case scalacheck.Test.Failed(_, labels)                  => fail(labels, "A property failed.")
-      case scalacheck.Test.PropException(_, e, labels)        => fail(labels, s"An exception was thrown during property evaluation: $e.")
-      case scalacheck.Test.Exhausted                          => fail(Set.empty, "Unable to generate data.")
+      case scalacheck.Test.Failed(_, labels) =>
+        fail(labels, "A property failed.")
+      case scalacheck.Test.PropException(_, e, labels) =>
+        fail(labels, s"An exception was thrown during property evaluation: $e.")
+      case scalacheck.Test.Exhausted =>
+        fail(Set.empty, "Unable to generate data.")
 
-  /**
-    * Check that a value of an arbitrary type `A` can be encoded and then successfully
-    * decoded with the given pair of encoder and decoder.
+  /** Check that a value of an arbitrary type `A` can be encoded and then
+    * successfully decoded with the given pair of encoder and decoder.
     */
-  def encodeAndThenDecodeProp[A](a: A)(using encA: Encoder[A], decA: Decoder[A]): Prop =
+  def encodeAndThenDecodeProp[A](
+      a: A
+  )(using encA: Encoder[A], decA: Decoder[A]): Prop =
     val maybeDecoded = decA.decode(encA.encode(a))
-    maybeDecoded.contains(a) :| s"Encoded value '$a' was not successfully decoded. Got '$maybeDecoded'."
+    maybeDecoded.contains(
+      a
+    ) :| s"Encoded value '$a' was not successfully decoded. Got '$maybeDecoded'."
 
   test("it is possible to encode and decode the 'Unit' value (0pts)") {
     checkProperty(Prop.forAll((unit: Unit) => encodeAndThenDecodeProp(unit)))
@@ -59,7 +68,7 @@ class CodecsSuite
   }
 
   test("it is possible to encode and decode 'Boolean' values (1pt)") {
-    checkProperty(Prop.forAll((b: Boolean) => encodeAndThenDecodeProp (b)))
+    checkProperty(Prop.forAll((b: Boolean) => encodeAndThenDecodeProp(b)))
   }
 
   test("a 'List[A]' value should be encoded as a JSON array (0pts)") {
@@ -71,36 +80,52 @@ class CodecsSuite
   test("it is possible to encode and decode lists (5pts)") {
     checkProperty(Prop.forAll((xs: List[Int]) => encodeAndThenDecodeProp(xs)))
   }
-  
-  test("A JSON array with at least one invalid element should be rejected (2pt)") {
+
+  test(
+    "A JSON array with at least one invalid element should be rejected (2pt)"
+  ) {
     val json = Json.Arr(List(Json.Num(1), Json.Str("foo")))
     val decoder = summon[Decoder[List[Int]]]
     assert(decoder.decode(json).isEmpty)
   }
 
   test("a 'Person' value should be encoded as a JSON object (1pt)") {
-    val person  = Person("Alice", 42)
-    val json    = Json.Obj(Map("name" -> Json.Str("Alice"), "age" -> Json.Num(42)))
+    val person = Person("Alice", 42)
+    val json = Json.Obj(Map("name" -> Json.Str("Alice"), "age" -> Json.Num(42)))
     val encoder = summon[Encoder[Person]]
     assertEquals(encoder.encode(person), json)
   }
 
   test("it is possible to encode and decode people (4pts)") {
-    checkProperty(Prop.forAll((s: String, x: Int) => encodeAndThenDecodeProp(Person(s, x))))
+    checkProperty(
+      Prop.forAll((s: String, x: Int) => encodeAndThenDecodeProp(Person(s, x)))
+    )
   }
 
   test("a 'Contacts' value should be encoded as a JSON object (1pt)") {
     val contacts = Contacts(List(Person("Alice", 42)))
-    val json = Json.Obj(Map("people" ->
-      Json.Arr(List(Json.Obj(Map("name" -> Json.Str("Alice"), "age" -> Json.Num(42)))))
-    ))
+    val json = Json.Obj(
+      Map(
+        "people" ->
+          Json.Arr(
+            List(
+              Json.Obj(Map("name" -> Json.Str("Alice"), "age" -> Json.Num(42)))
+            )
+          )
+      )
+    )
     val encoder = summon[Encoder[Contacts]]
     assertEquals(encoder.encode(contacts), json)
   }
 
   test("it is possible to encode and decode contacts (4pts)") {
-    val peopleGenerator = Gen.listOf(Gen.resultOf((s: String, x: Int) => Person (s, x)))
-    checkProperty(Prop.forAll(peopleGenerator)(people => encodeAndThenDecodeProp(Contacts(people))))
+    val peopleGenerator =
+      Gen.listOf(Gen.resultOf((s: String, x: Int) => Person(s, x)))
+    checkProperty(
+      Prop.forAll(peopleGenerator)(people =>
+        encodeAndThenDecodeProp(Contacts(people))
+      )
+    )
   }
 
 end CodecsSuite

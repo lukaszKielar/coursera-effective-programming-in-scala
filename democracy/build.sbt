@@ -1,6 +1,3 @@
-course := "effective-scala"
-assignment := "democracy"
-
 scalaVersion := "3.3.0"
 
 libraryDependencies ++= Seq(

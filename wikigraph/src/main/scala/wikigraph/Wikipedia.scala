@@ -1,8 +1,13 @@
 package wikigraph
 
+import wikigraph.errors.WikiError.ArticleNotFound
+import wikigraph.errors.WikiError.NoResult
+import wikigraph.errors.WikiError.TitleNotFound
+
+import scala.concurrent.ExecutionContext
+import scala.concurrent.Future
+
 import Articles.ArticleId
-import wikigraph.errors.WikiError.{ArticleNotFound, TitleNotFound, NoResult}
-import scala.concurrent.{ExecutionContext, Future}
 
 /** The interface of objects providing access to Wikipedia data.
   *

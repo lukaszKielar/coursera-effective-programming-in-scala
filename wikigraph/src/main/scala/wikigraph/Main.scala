@@ -1,8 +1,11 @@
-import scala.concurrent.{Await, ExecutionContext}
-import scala.concurrent.duration.DurationInt
-import wikigraph.implementations.Sqlite
 import wikigraph.Articles.ArticleId
 import wikigraph.Wikigraph
+import wikigraph.implementations.Sqlite
+
+import scala.concurrent.Await
+import scala.concurrent.ExecutionContext
+import scala.concurrent.duration.DurationInt
+
 import ExecutionContext.Implicits.global
 
 /** Use this function to test your implementations and to explore the dataset.

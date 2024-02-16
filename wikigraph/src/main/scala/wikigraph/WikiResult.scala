@@ -1,8 +1,10 @@
 package wikigraph
 
-import scala.concurrent.{ExecutionContext, Future}
 import wikigraph.errors.WikiError
 import wikigraph.errors.WikiException
+
+import scala.concurrent.ExecutionContext
+import scala.concurrent.Future
 
 /** The result of an asynchronous computation which may fail. This class is
   * wrapper of `Future[Either[Seq[WikiError], A]]`.

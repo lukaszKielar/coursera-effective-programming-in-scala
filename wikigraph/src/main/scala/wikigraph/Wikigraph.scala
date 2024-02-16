@@ -1,7 +1,7 @@
 package wikigraph
 
-import scala.concurrent.Future
 import scala.concurrent.ExecutionContext.Implicits.global
+import scala.concurrent.Future
 
 import Articles.ArticleId
 
@@ -123,15 +123,14 @@ final class Wikigraph(client: Wikipedia):
     *   elements:
     *   - the title of the article from which the distance is computed
     *   - the title of the article to which the distance is computed
-    *   - the distance (as returned by `breadFirstSearch`).
-    *   For instance:
-    *   {{{
+    *   - the distance (as returned by `breadFirstSearch`). For instance:
+    *     {{{
     *            Seq(
     *              ("article-1", "article-2", Some(1)),
     *              ("article-2", "article-1", None),
     *              ...
     *            )
-    *   }}}
+    *     }}}
     *
     * Hint: You should use the methods that you implemented on `WikiResult` as
     * well as `breadthFirstSearch`

@@ -1,15 +1,16 @@
 package wikigraph.implementations
 
-import scala.concurrent.{ExecutionContext, Future}
-
-import wikigraph.Articles.ArticleId
-import wikigraph.Wikipedia
-import wikigraph.WikiResult
-import wikigraph.errors.WikiError
-import wikigraph.errors.WikiError.{ArticleNotFound, TitleNotFound, NoResult}
-
 import slick.jdbc.SQLiteProfile.api.*
+import wikigraph.Articles.ArticleId
+import wikigraph.WikiResult
+import wikigraph.Wikipedia
+import wikigraph.errors.WikiError
+import wikigraph.errors.WikiError.ArticleNotFound
+import wikigraph.errors.WikiError.NoResult
+import wikigraph.errors.WikiError.TitleNotFound
 
+import scala.concurrent.ExecutionContext
+import scala.concurrent.Future
 import scala.language.implicitConversions
 
 case class Edge(toNode: Int, fromNode: Int)

@@ -1,12 +1,13 @@
 package wikigraph.implementations
 
-import scala.concurrent.ExecutionContext
-import wikigraph.Wikipedia
+import wikigraph.Articles.ArticleId
 import wikigraph.WikiResult
 import wikigraph.WikiResult.*
-import wikigraph.Articles.ArticleId
+import wikigraph.Wikipedia
 import wikigraph.errors.WikiError
 import wikigraph.errors.WikiError.*
+
+import scala.concurrent.ExecutionContext
 
 final class InMemory(graph: Map[ArticleId, Set[ArticleId]]) extends Wikipedia:
   override def linksFrom(art: ArticleId)(using

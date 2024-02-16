@@ -1,7 +1,8 @@
 package wikigraph
 
 import scala.concurrent.ExecutionContext.Implicits.global
-import scala.concurrent.{Future, Promise}
+import scala.concurrent.Future
+import scala.concurrent.Promise
 import scala.util.Try
 import scala.util.control.NonFatal
 

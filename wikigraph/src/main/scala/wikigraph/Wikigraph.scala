@@ -25,7 +25,10 @@ final class Wikigraph(client: Wikipedia):
     * a `Set`. Remember that you can use `.toSeq` and `.toSet`.
     */
   def namedLinks(of: ArticleId): WikiResult[Set[String]] =
-    ???
+    for
+      links <- client.linksFrom(of)
+      res <- WikiResult.traverse(links.toSeq)(client.nameOfArticle)
+    yield res.toSet
 
   /** Computes the distance between two pages using breadth first search.
     *
@@ -94,8 +97,32 @@ final class Wikigraph(client: Wikipedia):
         visited: Set[ArticleId],
         q: Queue[(Int, ArticleId)]
     ): WikiResult[Option[Int]] =
-      ???
+      if q.isEmpty then WikiResult.successful(None)
+      else {
+        val ((distance, article), remainingQ) = q.dequeue
+        if distance >= maxDepth then WikiResult.successful(None)
+        else
+          {
+            client
+              .linksFrom(article)
+              .flatMap(articleIds => {
+                if articleIds.contains(target) then
+                  WikiResult.successful(Some(distance))
+                else
+                  iter(
+                    visited + article,
+                    remainingQ.enqueueAll(
+                      articleIds
+                        .filter(articleId => !visited.contains(articleId))
+                        .map(articleId => (distance + 1, articleId))
+                    )
+                  )
+              })
+          }.fallbackTo(iter(visited + article, remainingQ))
+      }
+
     end iter
+
     if start == target then
       // The start node is the one we are looking for: the search succeeds with
       // a distance of 0.
@@ -139,5 +166,25 @@ final class Wikigraph(client: Wikipedia):
       titles: List[String],
       maxDepth: Int = 50
   ): WikiResult[Seq[(String, String, Option[Int])]] =
-    ???
+    val titlePairs =
+      for
+        startTitle <- titles
+        targetTitle <- titles if startTitle != targetTitle
+      yield (startTitle, targetTitle)
+
+    WikiResult.traverse(titlePairs) { (fromTitle, toTitle) =>
+      // start the title->id lookups in parallel
+      // @see https://danielwestheide.com/blog/the-neophytes-guide-to-scala-part-8-welcome-to-the-future/
+      val fromIdFuture = client.searchId(fromTitle)
+      val toIdFuture = client.searchId(toTitle)
+      for
+        fromId <- fromIdFuture
+        toId <- toIdFuture
+        bfsResult <- breadthFirstSearch(
+          fromId,
+          toId,
+          maxDepth
+        ) // must run serially after IDs since depends on IDs
+      yield (fromTitle, toTitle, bfsResult)
+    }
 end Wikigraph

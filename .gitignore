@@ -1,35 +1,40 @@
-.DS_Store
-*.class
-*.log
-*~
-
-# sbt specific
-dist/*
-target/
-lib_managed/
-src_managed/
-project/boot/
-project/plugins/project/
-project/local-plugins.sbt
-.history
+# bloop and metals
+.bloop
 .bsp
+.metals
+project/metals.sbt
 
-# Scala-IDE specific
-.scala_dependencies
-.cache
+# scala 3
+.tasty
+
+# sbt
+project/project/
+project/target/
+target/
+
+# eclipse
+build/
 .classpath
 .project
 .settings
-classes/
+.worksheet
+bin/
+.cache
 
-# idea
+# intellij idea
+*.log
+*.iml
+*.ipr
+*.iws
 .idea
-.idea_modules
-/.worksheet/
 
-# Dotty-IDE
-.dotty-ide-artifact
-.dotty-ide.json
+# mac
+.DS_Store
 
-# Visual Studio Code
-.vscode
+# other?
+.history
+.scala_dependencies
+.cache-main
+
+# general
+*.class

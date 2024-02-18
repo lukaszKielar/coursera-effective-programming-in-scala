@@ -1,21 +1,36 @@
 package todo
 
 import cats.implicits.*
-import scala.collection.mutable
 import todo.data.*
 
-/**
- * The InMemoryModel is a Model that stores all the tasks in RAM, and hence they
- * are lost when the server restarts.
- *
- * You should modify this file.
- */
+import scala.collection.mutable
+
+/** The InMemoryModel is a Model that stores all the tasks in RAM, and hence
+  * they are lost when the server restarts.
+  *
+  * You should modify this file.
+  */
 object InMemoryModel extends Model:
   /* These are the tasks the application starts with. You can change these if you want. */
   val defaultTasks = List(
-    Id(0) -> Task(State.completedNow, "Complete Effective Scala Week 2", None, List(Tag("programming"), Tag("scala"))),
-    Id(1) -> Task(State.Active, "Complete Effective Scala Week 3", Some("Finish the todo list exercise"), List(Tag("programming"), Tag("scala"), Tag("encapsulation"), Tag("sbt"))),
-    Id(2) -> Task(State.Active, "Make a sandwich", Some("Cheese and salad or ham and tomato?"), List(Tag("food"), Tag("lunch")))
+    Id(0) -> Task(
+      State.completedNow,
+      "Complete Effective Scala Week 2",
+      None,
+      List(Tag("programming"), Tag("scala"))
+    ),
+    Id(1) -> Task(
+      State.Active,
+      "Complete Effective Scala Week 3",
+      Some("Finish the todo list exercise"),
+      List(Tag("programming"), Tag("scala"), Tag("encapsulation"), Tag("sbt"))
+    ),
+    Id(2) -> Task(
+      State.Active,
+      "Make a sandwich",
+      Some("Cheese and salad or ham and tomato?"),
+      List(Tag("food"), Tag("lunch"))
+    )
   )
 
   /* Every Task is associated with an Id. Ids must be unique. */
@@ -41,17 +56,13 @@ object InMemoryModel extends Model:
     idStore.get(id)
 
   def complete(id: Id): Option[Task] =
-    idStore.get(id) match
-      case Some(task) => Some(task.complete)
-      case None => None
+    update(id)(_.complete)
 
   def update(id: Id)(f: Task => Task): Option[Task] =
     idStore.updateWith(id)(opt => opt.map(f))
 
   def delete(id: Id): Boolean =
-    idStore.remove(id) match
-      case Some(_) => true
-      case None => false
+    idStore.remove(id).isDefined
 
   def tasks: Tasks =
     Tasks(idStore)
@@ -61,8 +72,8 @@ object InMemoryModel extends Model:
     Tags(tags)
 
   def tasks(tag: Tag): Tasks =
-    val tagTasks = idStore.filter((_, task) => task.tags.contains(tag))
-    Tasks(tagTasks)
+    val tasks = idStore.filter((_, task) => task.tags.contains(tag))
+    Tasks(tasks)
 
   def clear(): Unit =
     idStore.clear()
